@@ -18,7 +18,6 @@ export function filmById(id) {
 } 
 
 export function createFilm(data){
-    console.log('in createfilm: ' + data.stars)
     const film = new Film({
         id: data.id,
         title: data.title,
