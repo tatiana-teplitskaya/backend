@@ -11,6 +11,7 @@ const app = express();
 
 app.use( bodyParser.json() );
 
+
 app.options('*', (req, res) => {
     res.set('Access-Control-Allow-Origin', '*');
     res.set('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
@@ -51,14 +52,25 @@ app.get('/films/search', (req, res) => {
 });
 
 
-app.post('/films', (req, res) => {
-    db.createFilm(req.body).then(data => {
+app.post('/films', async (req, res) => {
+    let isFilmNew = await db.isNew(req.body);
+    if (!isFilmNew){
         res.set('Access-Control-Allow-Origin', '*')
         res.set('Access-Control-Allow-Methods', 'POST, OPTIONS')
         res.set('Access-Control-Allow-Headers', 'Content-Type')
-        return res.status(201).json(data);
-    });
+        res.statusMessage = "This movie already exists!";
+        res.status(400).end();
+    } else {
+        db.createFilm(req.body).then(data => {
+            res.set('Access-Control-Allow-Origin', '*')
+            res.set('Access-Control-Allow-Methods', 'POST, OPTIONS')
+            res.set('Access-Control-Allow-Headers', 'Content-Type')
+            return res.status(201).json(data);
+        });
+    }
+    
 });
+
 
 app.delete('/films/:id', (req, res) => {
     db.deleteFilm(req.params.id).then(data => {
@@ -69,6 +81,7 @@ app.delete('/films/:id', (req, res) => {
     });
 });
 
-const server = app.listen(serverPort, ()=> {
+const server = app.listen(serverPort, () => {
     console.log(`Server is up on port ${serverPort}`);
 });
+

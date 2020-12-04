@@ -33,3 +33,24 @@ export function createFilm(data){
 export function deleteFilm(id) {
     return Film.findById(id).remove();
 }
+
+export async function isNew(newFilm) {
+    const films = await listFilms();
+    let isFilmNew = true;
+
+    const isSame = (arr1, arr2) => {
+
+        return !(arr1.sort() > arr2.sort() || arr1.sort() < arr2.sort());
+        
+    }
+
+    films.forEach(film => {
+        if(film.title === newFilm.title &&
+            film.year == newFilm.year &&
+            film.format === newFilm.format &&
+            isSame(film.stars, newFilm.stars)) {
+                isFilmNew = false;
+            }
+    })
+    return isFilmNew;
+}
