@@ -19,8 +19,9 @@ app.options('*', (req, res) => {
     res.send('ok');
   });
 
-app.get('/films/', (req, res) => {
-    db.listFilms().then(data => {
+app.get('/films/', async (req, res) => {
+    const {page = 1, limit = 10} = req.query;
+    db.listFilms(page, limit).then(data => {
         res.set('Access-Control-Allow-Origin', '*');
         res.set('Access-Control-Allow-Methods', 'GET, OPTIONS')
         res.set('Access-Control-Allow-Headers', 'Content-Type')
@@ -38,12 +39,8 @@ app.get('/about/:id', (req, res) => {
 });
 
 app.get('/films/search', (req, res) => {
-    const title = req.query.title;
-    const star = req.query.star;
-    db.listFilms().then(data => {
-        data = data.filter(film => {
-            return film.title.includes(title) && !!film.stars.find(item => item.includes(star));
-        });
+    const {page = 1, limit = 10, title, star} = req.query;
+    db.searchFilms(req.query).then(data => {
         res.set('Access-Control-Allow-Origin', '*');
         res.set('Access-Control-Allow-Methods', 'GET, OPTIONS')
         res.set('Access-Control-Allow-Headers', 'Content-Type')

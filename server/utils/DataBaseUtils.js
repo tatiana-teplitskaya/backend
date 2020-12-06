@@ -9,8 +9,9 @@ export function setUpConnection() {
     mongoose.connect(`mongodb://${config.db.host}:${config.db.port}/${config.db.name}`, { useNewUrlParser: true, useUnifiedTopology: true });
 }
 
-export function listFilms() {
-    return Film.find();
+export async function listFilms(page, limit) {
+    return {totalCount: await Film.find().countDocuments(),
+            films: await Film.find().limit(limit * 1).skip((page - 1) * limit)}
 }
 
 export function filmById(id) {
@@ -34,8 +35,21 @@ export function deleteFilm(id) {
     return Film.findById(id).remove();
 }
 
+export async function searchFilms({title, star, page = 1, limit = 10 }){
+    const titleSearch = new RegExp(`.*${title}.*`);
+    const starSearch = new RegExp(`.*${star}.*`)
+    let data = await Film.find({title: titleSearch, stars: starSearch}).limit(limit * 1).skip((page - 1) * limit);
+        // data = data.filter(film => {
+        //         return film.title.includes(title) && !!film.stars.find(item => item.includes(star));
+        // });
+        return {films: data,
+                totalCount: await Film.find({title: titleSearch, stars: starSearch}).countDocuments()}
+        
+    }
+    
+
 export async function isNew(newFilm) {
-    const films = await listFilms();
+    const films = await Film.find();
     let isFilmNew = true;
 
     const isSame = (arr1, arr2) => {
