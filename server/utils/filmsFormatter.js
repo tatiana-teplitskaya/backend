@@ -4,12 +4,12 @@ export function getArrFromFile(filedata){
     let newFilms = [];
     let fileContent = fs.readFileSync(filedata.path, "utf8");
     newFilms = getArrOfFilms(fileContent.split("\n"));
-
     return newFilms;
 }
 
 
 export function getArrOfFilms(arr){
+    //console.log(arr);
     let arrOfFilms = [];
     let formattedArrays = [];
     let tempArr = [];
@@ -25,7 +25,7 @@ export function getArrOfFilms(arr){
 
         }
     });
-    //console.log(formattedArrays);
+    console.log(formattedArrays);
 
     formattedArrays.forEach(arr => {
         let tempObj = {};

@@ -31,6 +31,29 @@ export function createFilm(data){
     return film.save();
 }
 
+
+export function createFilms(films){
+    let addedFilms = [];
+
+    films.forEach(film => {
+        if(isNew(film)) {
+            const element = new Film({
+                id: film.id,
+                title: film.title,
+                year: film.year,
+                format: film.format,
+                stars: film.stars,
+                createdAt: new Date(),
+            });
+            element.save()
+            addedFilms = [...addedFilms, film];
+        }
+    })
+    
+
+    return addedFilms;
+}
+
 export function deleteFilm(id) {
     return Film.findById(id).remove();
 }
