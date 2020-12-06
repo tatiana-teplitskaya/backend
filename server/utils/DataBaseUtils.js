@@ -39,9 +39,6 @@ export async function searchFilms({title, star, page = 1, limit = 10 }){
     const titleSearch = new RegExp(`.*${title}.*`);
     const starSearch = new RegExp(`.*${star}.*`)
     let data = await Film.find({title: titleSearch, stars: starSearch}).limit(limit * 1).skip((page - 1) * limit);
-        // data = data.filter(film => {
-        //         return film.title.includes(title) && !!film.stars.find(item => item.includes(star));
-        // });
         return {films: data,
                 totalCount: await Film.find({title: titleSearch, stars: starSearch}).countDocuments()}
         

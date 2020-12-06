@@ -1,12 +1,10 @@
-export function getArrFromFile(file){
+const fs = require('fs');
+
+export function getArrFromFile(filedata){
     let newFilms = [];
-    var reader = new FileReader();
-            reader.readAsText(file);
-            //reader.readAsArrayBuffer(blob);
-            reader.onload = e => {
-                newFilms = getArrOfFilms(reader.result.split("\n"));
-                newFilms.forEach(film => this.props.addFilm(film));
-            };
+    let fileContent = fs.readFileSync(filedata.path, "utf8");
+    newFilms = getArrOfFilms(fileContent.split("\n"));
+
     return newFilms;
 }
 

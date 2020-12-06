@@ -1,15 +1,20 @@
 import express from 'express';
+import multer from 'multer';
 import bodyParser from 'body-parser';
 
 import { serverPort } from '../etc/config.json';
 
 import * as db from './utils/DataBaseUtils';
+import { getArrFromFile } from './utils/filmsFormatter';
 
 db.setUpConnection();
 
 const app = express();
 
 app.use( bodyParser.json() );
+app.use(express.static('uploads'));
+app.use(multer({dest:"uploads"}).single("filedata"));
+
 
 
 app.options('*', (req, res) => {
@@ -65,6 +70,30 @@ app.post('/films', async (req, res) => {
             return res.status(201).json(data);
         });
     }
+    
+});
+
+app.post('/file', async (req, res) => {
+    let filedata = req.file;
+    if(!filedata){
+        res.set('Access-Control-Allow-Origin', '*')
+        res.set('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        res.set('Access-Control-Allow-Headers', 'Content-Type')
+        res.statusMessage = "Bad file!";
+        res.status(400).end();
+    } else {
+        let films = getArrFromFile(filedata);
+        films.forEach(async film => {
+            let isFilmNew = await db.isNew(film);
+            if (isFilmNew){
+                db.createFilm(film);
+        }})
+        res.set('Access-Control-Allow-Origin', '*')
+        res.set('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        res.set('Access-Control-Allow-Headers', 'Content-Type')
+        return res.status(201).json(films);
+    }
+    
     
 });
 
